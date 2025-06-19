@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诗云简历生成器 - 离线版</title>
+    <link href="https://unpkg.com/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* CSS变量定义主题颜色 */
+        :root {
+            --theme-primary: #8b5cf6;
+            --theme-secondary: #7c3aed;
+            --theme-gradient: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%);
+            --theme-hover-primary: #7c3aed;
+            --theme-hover-secondary: #6d28d9;
+            --theme-hover-gradient: linear-gradient(135deg, var(--theme-hover-primary) 0%, var(--theme-hover-secondary) 100%);
+            --theme-text-light: rgba(255, 255, 255, 0.9);
+            --theme-accent: var(--theme-primary);
+        }
+
+        /* 折叠功能样式 */
+        .collapsible-card {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .collapsible-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .card-toggle-header {
+            cursor: pointer;
+            background: var(--theme-gradient);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-toggle-header:hover {
+            background: var(--theme-hover-gradient);
+        }
+        
+        .card-toggle-header h5 {
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .collapse-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .collapse-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
+        .card-summary {
+            padding: 8px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .card-content {
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .export-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .export-pdf-button {
+            background: var(--theme-gradient);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .export-pdf-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            background: var(--theme-hover-gradient);
+        }
+
+        .export-word-button {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        .export-word-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        }
+
+        /* 主题颜色选择器样式 */
+        .theme-color-selector {
+            margin-bottom: 20px;
+        }
+
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 100%;
+            height: 50px;
+            border-radius: 8px;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .color-option.active {
+            border-color: #fff;
+            box-shadow: 0 0 0 2px #000;
+            transform: scale(1.05);
+        }
+
+        .color-option .check-icon {
+            color: white;
+            font-size: 18px;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .color-option.active .check-icon {
+            opacity: 1;
+        }
+
+        .theme-header {
+            background: var(--theme-gradient);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-content {
+            background: white;
+            padding: 16px;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e9ecef;
+            border-top: none;
+        }
+
+        /* 模板选择器样式 */
+        .template-selector {
+            margin-bottom: 20px;
+        }
+
+        .template-options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .template-option {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .template-option:hover {
+            border-color: var(--theme-primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .template-option.active {
+            border-color: var(--theme-primary);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .template-preview {
+            flex-shrink: 0;
+            width: 60px;
+            height: 80px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .template-mini-preview {
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        /* 经典模板预览 */
+        .classic-preview .mini-header {
+            background: var(--theme-gradient);
+            height: 25%;
+            width: 100%;
+        }
+
+        .classic-preview .mini-content {
+            padding: 8px 6px;
+        }
+
+        .classic-preview .mini-line {
+            background: #dee2e6;
+            height: 3px;
+            margin-bottom: 3px;
+            border-radius: 1px;
+        }
+
+        .classic-preview .mini-line.short {
+            width: 60%;
+        }
+
+        /* 现代模板预览 */
+        .modern-preview .mini-header.modern {
+            background: var(--theme-gradient);
+            height: 30%;
+            width: 100%;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .modern-preview .mini-content.modern {
+            padding: 6px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+        }
+
+        .modern-preview .mini-line {
+            background: #dee2e6;
+            height: 2px;
+            margin-bottom: 2px;
+            border-radius: 1px;
+        }
+
+        /* 创意模板预览 */
+        .creative-preview {
+            display: flex;
+        }
+
+        .creative-preview .mini-sidebar {
+            background: var(--theme-gradient);
+            width: 35%;
+            height: 100%;
+        }
+
+        .creative-preview .mini-main {
+            flex: 1;
+            padding: 6px 4px;
+        }
+
+        .creative-preview .mini-line {
+            background: #dee2e6;
+            height: 2px;
+            margin-bottom: 3px;
+            border-radius: 1px;
+        }
+
+        .creative-preview .mini-line.short {
+            width: 70%;
+        }
+
+        /* 商务模板预览 */
+        .business-preview {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .business-preview .mini-header-section {
+            background: var(--theme-gradient);
+            height: 20%;
+            width: 100%;
+        }
+
+        .business-preview .mini-content-section {
+            flex: 1;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+
+        .business-preview .mini-line {
+            background: #dee2e6;
+            height: 2px;
+            border-radius: 1px;
+            margin-bottom: 2px;
+        }
+
+        .business-preview .mini-line.medium {
+            width: 80%;
+        }
+
+        .business-preview .mini-line.short {
+            width: 50%;
+        }
+
+        /* 极简模板预览 */
+        .minimal-preview {
+            padding: 6px;
+        }
+
+        .minimal-preview .mini-title {
+            background: var(--theme-primary);
+            height: 4px;
+            width: 80%;
+            margin-bottom: 6px;
+            border-radius: 2px;
+        }
+
+        .minimal-preview .mini-line {
+            background: #dee2e6;
+            height: 2px;
+            margin-bottom: 3px;
+            border-radius: 1px;
+        }
+
+        .minimal-preview .mini-line.short {
+            width: 60%;
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-name {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+        }
+
+        .template-description {
+            font-size: 0.8em;
+            color: #6c757d;
+            line-height: 1.3;
+        }
+
+        .template-option.active .template-name {
+            color: var(--theme-primary);
+        }
+
+        .template-option.active .template-description {
+            color: var(--theme-secondary);
+        }
+
+        /* 预览区域主题样式 */
+        .preview-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .preview-header {
+            background: var(--theme-gradient);
+            color: var(--theme-text-light);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--theme-accent);
+        }
+
+        .preview-header h4 {
+            margin: 0;
+            font-weight: 600;
+            color: white;
+        }
+
+        .preview-header small {
+            color: var(--theme-text-light);
+            opacity: 0.9;
+        }
+
+        /* 确保预览区域的姓名和职位标题始终为白色 */
+        #resume-preview .resume-name,
+        #resume-preview .name,
+        #resume-preview h1,
+        #resume-preview .truename {
+            color: #fa5b5b !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        #resume-preview .resume-title,
+        #resume-preview .position,
+        #resume-preview .job-title,
+        #resume-preview .title,
+        #resume-preview .resume-position {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* 针对极简模板的特殊处理 - 确保姓名和职位在有彩色背景的区域保持白色 */
+        #resume-preview.minimal-template .header-section .resume-name,
+        #resume-preview.minimal-template .header-section .name,
+        #resume-preview.minimal-template .header-section h1,
+        #resume-preview.minimal-template .header-section .truename,
+        #resume-preview.minimal-template .header-section .resume-title,
+        #resume-preview.minimal-template .header-section .position,
+        #resume-preview.minimal-template .header-section .job-title,
+        #resume-preview.minimal-template .header-section .title {
+            color: #ffffff !important;
+        }
+
+        /* 确保蓝山简历样式中的姓名保持白色 */
+        #resume-preview .base-name .truename {
+            color: #ffffff !important;
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* 状态提示样式 */
+        #export-status {
+            font-size: 14px;
+            min-height: 20px;
+        }
+        
+        .status-success {
+            color: #198754;
+            background: #d1e7dd;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 4px solid #198754;
+        }
+        
+        .status-error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .status-warning {
+            color: #fd7e14;
+            background: #fff3cd;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 4px solid #fd7e14;
+        }
+
+        /* 按钮主题色应用 */
+        .btn-primary {
+            background: var(--theme-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--theme-hover-gradient);
+        }
+
+        .btn-outline-primary {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--theme-primary);
+            border-color: var(--theme-primary);
+        }
+
+        /* 头像上传样式 */
+        .avatar-upload {
+            text-align: center;
+        }
+
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid #e9ecef;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .avatar-preview .placeholder {
+            color: #6c757d;
+            text-align: center;
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 技能评级样式 */
+        .skill-rating {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .skill-rating .star {
+            font-size: 18px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .skill-rating .star.active {
+            color: #ffd700;
+        }
+
+        .skill-rating .star:hover {
+            color: #ffd700;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .color-options {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .export-section .btn {
+                margin-bottom: 10px;
+            }
+            
+            .avatar-preview {
+                width: 120px;
+                height: 120px;
+            }
+
+            .template-option {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .template-preview {
+                width: 80px;
+                height: 100px;
+            }
+        }
+
+        /* 为了确保预览区域的样式优先级 */
+        #resume-preview * {
+            transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease !important;
+        }
+
+        /* Word导出相关样式 */
+        .export-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 576px) {
+            .export-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body data-theme-color="#8b5cf6">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 左侧编辑区域 -->
+            <div class="col-md-5 editor-panel">
+                <form id="resumeForm">
+                    <!-- 个人头像 -->
+                    <div class="card collapsible-card mb-3">
+                        <div class="card-toggle-header" data-bs-toggle="collapse" data-bs-target="#avatarCollapse" aria-expanded="false">
+                            <h5><i class="fas fa-user-circle"></i> 个人头像</h5>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div id="avatarSummary" class="card-summary">
+                            点击上传头像图片
+                        </div>
+                        <div class="collapse" id="avatarCollapse">
+                            <div class="card-body card-content">
+                                <div class="avatar-upload">
+                                    <div class="avatar-preview" id="avatar-preview">
+                                        <div class="placeholder">点击下方按钮上传头像</div>
+                                    </div>
+                                    <label for="avatar-input" class="btn btn-outline-primary mt-2">选择头像</label>
+                                    <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 主题颜色选择器 -->
+                    <div class="theme-color-selector">
+                        <div class="theme-header">
+                            <i class="fas fa-palette"></i>
+                            主题颜色
+                        </div>
+                        <div class="theme-content">
+                            <p class="mb-2 text-muted small">选择你喜欢的主题色彩，实时预览效果</p>
+                            <div class="color-options">
+                                <!-- 默认紫色 -->
+                                <div class="color-option active" 
+                                     data-theme="default"
+                                     data-primary="#8b5cf6" 
+                                     data-secondary="#7c3aed"
+                                     style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                                
+                                <!-- 海洋蓝 -->
+                                <div class="color-option" 
+                                     data-theme="ocean"
+                                     data-primary="#00c6ff" 
+                                     data-secondary="#0072ff"
+                                     style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                                
+                                <!-- 日落橙 -->
+                                <div class="color-option" 
+                                     data-theme="sunset"
+                                     data-primary="#ff7e5f" 
+                                     data-secondary="#feb47b"
+                                     style="background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                                
+                                <!-- 森林绿 -->
+                                <div class="color-option" 
+                                     data-theme="forest"
+                                     data-primary="#11998e" 
+                                     data-secondary="#38ef7d"
+                                     style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                                
+                                <!-- 樱花粉 -->
+                                <div class="color-option" 
+                                     data-theme="cherry"
+                                     data-primary="#ff9a8b" 
+                                     data-secondary="#a890fe"
+                                     style="background: linear-gradient(135deg, #ff9a8b 0%, #a890fe 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                                
+                                <!-- 深紫色 -->
+                                <div class="color-option" 
+                                     data-theme="purple"
+                                     data-primary="#8360c3" 
+                                     data-secondary="#2ebf91"
+                                     style="background: linear-gradient(135deg, #8360c3 0%, #2ebf91 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                                
+                                <!-- 商务灰 -->
+                                <div class="color-option" 
+                                     data-theme="business"
+                                     data-primary="#485563" 
+                                     data-secondary="#29323c"
+                                     style="background: linear-gradient(135deg, #485563 0%, #29323c 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                                
+                                <!-- 科技蓝 -->
+                                <div class="color-option" 
+                                     data-theme="tech"
+                                     data-primary="#1e3c72" 
+                                     data-secondary="#2a5298"
+                                     style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                                    <i class="fas fa-check check-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 模板选择器 -->
+                    <div class="template-selector">
+                        <div class="theme-header">
+                            <i class="fas fa-file-alt"></i>
+                            简历模板
+                        </div>
+                        <div class="theme-content">
+                            <p class="mb-3 text-muted small">选择适合的简历模板风格</p>
+                            <div class="template-options">
+                                <!-- 经典商务模板 -->
+                                <div class="template-option active" data-template="classic">
+                                    <div class="template-preview">
+                                        <div class="template-mini-preview classic-preview">
+                                            <div class="mini-header"></div>
+                                            <div class="mini-content">
+                                                <div class="mini-line"></div>
+                                                <div class="mini-line"></div>
+                                                <div class="mini-line short"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="template-info">
+                                        <div class="template-name">经典商务</div>
+                                        <div class="template-description">传统正式风格，适合大多数行业和职位申请</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 现代简约模板 -->
+                                <div class="template-option" data-template="modern">
+                                    <div class="template-preview">
+                                        <div class="template-mini-preview modern-preview">
+                                            <div class="mini-header modern"></div>
+                                            <div class="mini-content modern">
+                                                <div class="mini-line"></div>
+                                                <div class="mini-line"></div>
+                                                <div class="mini-line short"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="template-info">
+                                        <div class="template-name">现代简约</div>
+                                        <div class="template-description">简洁现代设计，适合创意和科技类职位</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 创意设计模板 -->
+                                <div class="template-option" data-template="creative">
+                                    <div class="template-preview">
+                                        <div class="template-mini-preview creative-preview">
+                                            <div class="mini-sidebar"></div>
+                                            <div class="mini-main">
+                                                <div class="mini-line"></div>
+                                                <div class="mini-line"></div>
+                                                <div class="mini-line short"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="template-info">
+                                        <div class="template-name">创意设计</div>
+                                        <div class="template-description">个性化侧边栏风格，适合设计师和创意职位</div>
+                                    </div>
+                                </div>
+
+                                <!-- 商务专业模板 -->
+                                <div class="template-option" data-template="business">
+                                    <div class="template-preview">
+                                        <div class="template-mini-preview business-preview">
+                                            <div class="mini-header-section"></div>
+                                            <div class="mini-content-section">
+                                                <div class="mini-line"></div>
+                                                <div class="mini-line medium"></div>
+                                                <div class="mini-line short"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="template-info">
+                                        <div class="template-name">商务专业</div>
+                                        <div class="template-description">专业商务风格，适合管理层和高级职位</div>
+                                    </div>
+                                </div>
+
+                                <!-- 极简模板 -->
+                                <div class="template-option" data-template="minimal">
+                                    <div class="template-preview">
+                                        <div class="template-mini-preview minimal-preview">
+                                            <div class="mini-title"></div>
+                                            <div class="mini-line"></div>
+                                            <div class="mini-line"></div>
+                                            <div class="mini-line short"></div>
+                                        </div>
+                                    </div>
+                                    <div class="template-info">
+                                        <div class="template-name">极简风格</div>
+                                        <div class="template-description">简洁至上，突出内容本身的重要性</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="templateSummary" class="mt-2 small text-muted">
+                                当前选择：<span id="currentTemplateName">经典商务</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 基本信息 -->
+                    <div class="card collapsible-card mb-3">
+                        <div class="card-toggle-header" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" aria-expanded="true">
+                            <h5><i class="fas fa-id-card"></i> 基本信息</h5>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div id="basicInfoSummary" class="card-summary">
+                            姓名、联系方式等基本信息
+                        </div>
+                        <div class="collapse show" id="basicInfoCollapse">
+                            <div class="card-body card-content">
+                                <div class="mb-3">
+                                    <label class="form-label">姓名 *</label>
+                                    <input type="text" class="form-control" id="name" placeholder="请输入姓名" value="情诗">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">求职岗位</label>
+                                    <input type="text" class="form-control" id="title" placeholder="如：前端开发工程师" value="前端开发工程师">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">个人标语</label>
+                                    <textarea class="form-control" id="tagline" rows="2" placeholder="如：热爱技术，追求极致用户体验的前端开发者">热爱技术，追求极致用户体验的前端开发者</textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">电话</label>
+                                        <input type="text" class="form-control" id="phone" placeholder="请输入电话号码" value="173*****573">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">邮箱 *</label>
+                                        <input type="email" class="form-control" id="email" placeholder="请输入邮箱" value="1700022200@qq.com">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">GitHub/作品集</label>
+                                        <input type="text" class="form-control" id="github" placeholder="GitHub地址或作品集链接" value="https://github.com/shiyun520">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">工作地点</label>
+                                        <input type="text" class="form-control" id="location" placeholder="如：桂林市" value="桂林市">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">职位描述</label>
+                                    <input type="text" class="form-control" id="position-desc" placeholder="如：高级前端开发工程师" value="高级前端开发工程师">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 个人技能 -->
+                    <div class="card collapsible-card mb-3">
+                        <div class="card-toggle-header" data-bs-toggle="collapse" data-bs-target="#skillsCollapse" aria-expanded="false">
+                            <h5><i class="fas fa-code"></i> 个人技能</h5>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div id="skillsSummary" class="card-summary">
+                            已添加 <span id="skillsCount">0</span> 项技能
+                        </div>
+                        <div class="collapse" id="skillsCollapse">
+                            <div class="card-body card-content">
+                                <div id="skills-container">
+                                    <!-- 动态生成的技能项 -->
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm mt-2" type="button" onclick="addSkill()">
+                                    <i class="fas fa-plus"></i> 添加技能
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 教育背景 -->
+                    <div class="card collapsible-card mb-3">
+                        <div class="card-toggle-header" data-bs-toggle="collapse" data-bs-target="#educationCollapse" aria-expanded="false">
+                            <h5><i class="fas fa-graduation-cap"></i> 教育背景</h5>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div id="educationSummary" class="card-summary">
+                            已添加 <span id="educationCount">0</span> 条教育经历
+                        </div>
+                        <div class="collapse" id="educationCollapse">
+                            <div class="card-body card-content">
+                                <div id="education-container">
+                                    <!-- 动态生成的教育背景项 -->
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="addEducation()">
+                                    <i class="fas fa-plus"></i> 添加教育经历
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 工作经历 -->
+                    <div class="card collapsible-card mb-3">
+                        <div class="card-toggle-header" data-bs-toggle="collapse" data-bs-target="#workCollapse" aria-expanded="false">
+                            <h5><i class="fas fa-briefcase"></i> 工作经历</h5>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div id="workSummary" class="card-summary">
+                            已添加 <span id="workCount">0</span> 份工作经历
+                        </div>
+                        <div class="collapse" id="workCollapse">
+                            <div class="card-body card-content">
+                                <div id="work-container">
+                                    <!-- 动态生成的工作经历项 -->
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="addWorkExperience()">
+                                    <i class="fas fa-plus"></i> 添加工作经历
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 项目经验 -->
+                    <div class="card collapsible-card mb-3">
+                        <div class="card-toggle-header" data-bs-toggle="collapse" data-bs-target="#projectsCollapse" aria-expanded="false">
+                            <h5><i class="fas fa-project-diagram"></i> 项目经验</h5>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div id="projectsSummary" class="card-summary">
+                            已添加 <span id="projectsCount">0</span> 个项目
+                        </div>
+                        <div class="collapse" id="projectsCollapse">
+                            <div class="card-body card-content">
+                                <div id="projects-container">
+                                    <!-- 动态生成的项目经验项 -->
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="addProject()">
+                                    <i class="fas fa-plus"></i> 添加项目
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 更多信息 -->
+                    <div class="card collapsible-card mb-3">
+                        <div class="card-toggle-header" data-bs-toggle="collapse" data-bs-target="#moreInfoCollapse" aria-expanded="false">
+                            <h5><i class="fas fa-info-circle"></i> 更多信息</h5>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div id="moreInfoSummary" class="card-summary">
+                            已添加 <span id="moreInfoCount">0</span> 条更多信息
+                        </div>
+                        <div class="collapse" id="moreInfoCollapse">
+                            <div class="card-body card-content">
+                                <div id="more-info-container">
+                                    <!-- 动态生成的更多信息项 -->
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="addMoreInfo()">
+                                    <i class="fas fa-plus"></i> 添加更多信息
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮区域 -->
+                    <div class="export-section">
+                        <div class="text-center mb-3">
+                            <h6><i class="fas fa-tools"></i> 简历操作</h6>
+                        </div>
+                        
+                        <div id="export-status" class="mb-3" style="min-height: 24px;"></div>
+                        
+                        <!-- 主要导出按钮 -->
+                        <div class="export-options mb-3">
+                            <button 
+                                type="button" 
+                                class="btn btn-success btn-lg export-pdf-button" 
+                                id="export-pdf-btn"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top" 
+                                title="生成自适应尺寸PDF">
+                                <i class="fas fa-file-pdf me-2"></i>
+                                导出PDF
+                            </button>
+                            
+                            <button 
+                                type="button" 
+                                class="btn btn-primary btn-lg export-word-button" 
+                                id="export-word-btn"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top" 
+                                title="导出为Word文档">
+                                <i class="fas fa-file-word me-2"></i>
+                                导出Word
+                            </button>
+                        </div>
+                        
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button 
+                                    type="button" 
+                                    class="btn btn-outline-primary btn-lg w-100" 
+                                    onclick="previewPDF()"
+                                    data-bs-toggle="tooltip" 
+                                    data-bs-placement="top" 
+                                    title="在新窗口预览PDF效果">
+                                    <i class="fas fa-eye me-2"></i>
+                                    预览PDF
+                                </button>
+                            </div>
+                            
+                            <div class="col-6">
+                                <button type="button" class="btn btn-primary btn-lg w-100" onclick="saveResume()">
+                                    <i class="fas fa-save me-2"></i>
+                                    保存简历
+                                </button>
+                            </div>
+                            
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-warning btn-lg w-100" onclick="exportData()">
+                                    <i class="fas fa-download me-2"></i>
+                                    导出数据
+                                </button>
+                            </div>
+                            
+                            <div class="col-6">
+                                <label for="import-data" class="btn btn-outline-info btn-lg w-100 mb-0">
+                                    <i class="fas fa-upload me-2"></i>
+                                    导入数据
+                                </label>
+                                <input type="file" id="import-data" accept=".json" style="display: none;" onchange="importData(event)">
+                            </div>
+                            
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-danger btn-lg w-100" onclick="clearForm()">
+                                    <i class="fas fa-trash-alt me-2"></i>
+                                    清空表单
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 右侧预览区域 -->
+            <div class="col-md-7 preview-panel">
+                <div class="preview-container">
+                    <div class="preview-header">
+                        <h4><i class="fas fa-eye"></i> 实时预览</h4>
+                        <small class="text-muted">左侧编辑，右侧实时查看效果</small>
+                    </div>
+                    <div id="resume-preview" class="resume-template">
+                        <!-- 动态生成的简历内容 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!-- 引入 html2pdf.js -->
+    <script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+    <!-- 引入 docx.js 用于生成Word文档 -->
+    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
+    <!-- 引入 FileSaver.js 用于保存文件 -->
+    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <!-- 引入html-to-docx库用于HTML转Word -->
+    <script src="https://unpkg.com/html-to-docx@1.8.0/dist/html-to-docx.umd.js"></script>
+    <!-- 使用离线版JavaScript -->
+    <script src="assets/js/app.js"></script>
+    
+    <script>
+        // 主题颜色管理 - 完全离线版本
+        const ThemeManager = {
+            themes: {
+                'default': { primary: '#8b5cf6', secondary: '#7c3aed' },
+                'ocean': { primary: '#00c6ff', secondary: '#0072ff' },
+                'sunset': { primary: '#ff7e5f', secondary: '#feb47b' },
+                'forest': { primary: '#11998e', secondary: '#38ef7d' },
+                'cherry': { primary: '#ff9a8b', secondary: '#a890fe' },
+                'purple': { primary: '#8360c3', secondary: '#2ebf91' },
+                'business': { primary: '#485563', secondary: '#29323c' },
+                'tech': { primary: '#1e3c72', secondary: '#2a5298' }
+            },
+
+            // 应用主题
+            applyTheme: function(themeName) {
+                const theme = this.themes[themeName];
+                if (!theme) return;
+
+                // 更新CSS变量
+                const root = document.documentElement;
+                root.style.setProperty('--theme-primary', theme.primary);
+                root.style.setProperty('--theme-secondary', theme.secondary);
+                root.style.setProperty('--theme-accent', theme.primary);
+                root.style.setProperty('--theme-gradient', 
+                    `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`);
+                root.style.setProperty('--theme-text-light', 'rgba(255, 255, 255, 0.9)');
+                
+                // 计算悬停效果颜色（稍微暗一点）
+                const hoverPrimary = this.adjustBrightness(theme.primary, -10);
+                const hoverSecondary = this.adjustBrightness(theme.secondary, -10);
+                root.style.setProperty('--theme-hover-primary', hoverPrimary);
+                root.style.setProperty('--theme-hover-secondary', hoverSecondary);
+                root.style.setProperty('--theme-hover-gradient', 
+                    `linear-gradient(135deg, ${hoverPrimary} 0%, ${hoverSecondary} 100%)`);
+
+                // 更新选中状态
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                const selectedOption = document.querySelector(`[data-theme="${themeName}"]`);
+                if (selectedOption) {
+                    selectedOption.classList.add('active');
+                }
+
+                // 保存到本地存储
+                localStorage.setItem('resume-theme', themeName);
+
+                // 更新body的主题颜色属性
+                document.body.setAttribute('data-theme-color', theme.primary);
+
+                // 通知app.js主题已更改
+                if (typeof updateThemeColor === 'function') {
+                    updateThemeColor(theme.primary);
+                }
+
+                // 显示切换提示
+                this.showThemeChangeNotification(themeName);
+            },
+
+            // 调整颜色亮度
+            adjustBrightness: function(hex, percent) {
+                const num = parseInt(hex.replace("#", ""), 16);
+                const amt = Math.round(2.55 * percent);
+                const R = (num >> 16) + amt;
+                const G = (num >> 8 & 0x00FF) + amt;
+                const B = (num & 0x0000FF) + amt;
+                return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                    (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+            },
+
+            // 显示主题切换通知
+            showThemeChangeNotification: function(themeName) {
+                const notifications = {
+                    'default': '🎨 已切换到默认紫色主题',
+                    'ocean': '🌊 已切换到海洋蓝主题',
+                    'sunset': '🌅 已切换到日落橙主题',
+                    'forest': '🌲 已切换到森林绿主题',
+                    'cherry': '🌸 已切换到樱花粉主题',
+                    'purple': '💜 已切换到深紫色主题',
+                    'business': '💼 已切换到商务灰主题',
+                    'tech': '⚡已切换到科技蓝主题'
+                };
+
+                const message = notifications[themeName] || '主题已更换';
+                
+                if (typeof showMessage === 'function') {
+                    showMessage(message, 'success');
+                }
+            },
+
+            // 初始化
+            init: function() {
+                // 从本地存储恢复主题
+                const savedTheme = localStorage.getItem('resume-theme') || 'default';
+                this.applyTheme(savedTheme);
+
+                // 绑定颜色选择事件
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const themeName = option.dataset.theme;
+                        this.applyTheme(themeName);
+                    });
+                });
+            }
+        };
+
+        // 模板管理器 - 完全离线版本
+        const TemplateManager = {
+            currentTemplate: 'classic',
+            
+            templates: {
+                'classic': {
+                    name: '经典商务',
+                    description: '传统正式风格，适合大多数行业和职位申请'
+                },
+                'modern': {
+                    name: '现代简约',
+                    description: '简洁现代设计，适合创意和科技类职位'
+                },
+                'creative': {
+                    name: '创意设计',
+                    description: '个性化侧边栏风格，适合设计师和创意职位'
+                },
+                'business': {
+                    name: '商务专业',
+                    description: '专业商务风格，适合管理层和高级职位'
+                },
+                'minimal': {
+                    name: '极简风格',
+                    description: '简洁至上，突出内容本身的重要性'
+                }
+            },
+
+            // 应用模板
+            applyTemplate: function(templateName) {
+                if (!this.templates[templateName]) return;
+
+                this.currentTemplate = templateName;
+
+                // 更新选中状态
+                document.querySelectorAll('.template-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                const selectedOption = document.querySelector(`[data-template="${templateName}"]`);
+                if (selectedOption) {
+                    selectedOption.classList.add('active');
+                }
+
+                // 更新当前模板名称显示
+                const currentTemplateNameEl = document.getElementById('currentTemplateName');
+                if (currentTemplateNameEl) {
+                    currentTemplateNameEl.textContent = this.templates[templateName].name;
+                }
+
+                // 保存到本地存储
+                localStorage.setItem('resume-template', templateName);
+
+                // 显示切换提示
+                this.showTemplateChangeNotification(templateName);
+
+                // 通知app.js更新预览
+                if (typeof updatePreview === 'function') {
+                    setTimeout(updatePreview, 100);
+                }
+            },
+
+            // 显示模板切换通知
+            showTemplateChangeNotification: function(templateName) {
+                const templateInfo = this.templates[templateName];
+                const message = `📄 已切换到${templateInfo.name}模板`;
+                
+                if (typeof showMessage === 'function') {
+                    showMessage(message, 'success');
+                }
+            },
+
+            // 获取当前模板
+            getCurrentTemplate: function() {
+                return this.currentTemplate;
+            },
+
+            // 初始化模板管理器
+            init: function() {
+                // 从本地存储恢复模板
+                const savedTemplate = localStorage.getItem('resume-template') || 'classic';
+                this.currentTemplate = savedTemplate;
+
+                // 设置选中状态
+                document.querySelectorAll('.template-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                const savedOption = document.querySelector(`[data-template="${savedTemplate}"]`);
+                if (savedOption) {
+                    savedOption.classList.add('active');
+                }
+
+                // 更新当前模板名称显示
+                const currentTemplateNameEl = document.getElementById('currentTemplateName');
+                if (currentTemplateNameEl && this.templates[savedTemplate]) {
+                    currentTemplateNameEl.textContent = this.templates[savedTemplate].name;
+                }
+
+                // 绑定模板选择事件
+                document.querySelectorAll('.template-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const templateName = option.dataset.template;
+                        this.applyTemplate(templateName);
+                    });
+                });
+            }
+        };
+
+        // Word导出功能
+        const WordExporter = {
+            // 导出为Word文档
+            exportToWord: async function() {
+                try {
+                    // 检查依赖
+                    if (typeof HTMLtoDOCX === 'undefined') {
+                        this.showWordError('Word导出库未加载，请检查网络连接');
+                        return;
+                    }
+
+                    this.showWordLoadingState('正在生成Word文档...');
+
+                    // 获取简历数据
+                    const formData = this.getFormData();
+                    if (!this.validateRequiredFields(formData)) {
+                        this.hideWordLoadingState();
+                        return;
+                    }
+
+                    // 生成纯HTML内容（适合Word导出）
+                    const htmlContent = this.generateWordHTML(formData);
+                    
+                    // 配置导出选项
+                    const options = {
+                        table: { row: { cantSplit: true } },
+                        footer: false,
+                        pageNumber: false,
+                        font: 'Microsoft YaHei',
+                        fontSize: 12,
+                        orientation: 'portrait',
+                        margins: {
+                            top: 720,    // 2cm in twips
+                            right: 720,
+                            bottom: 720,
+                            left: 720
+                        }
+                    };
+
+                    // 转换HTML为Word文档
+                    const docxBlob = await HTMLtoDOCX(htmlContent, null, options);
+                    
+                    // 生成文件名
+                    const fileName = `${formData.name || '简历'}_${new Date().toISOString().slice(0, 10)}.docx`;
+                    
+                    // 保存文件
+                    if (typeof saveAs !== 'undefined') {
+                        saveAs(docxBlob, fileName);
+                        this.hideWordLoadingState();
+                        this.showWordSuccess('Word文档生成成功！');
+                    } else {
+                        // 备用下载方法
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(docxBlob);
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                        
+                        this.hideWordLoadingState();
+                        this.showWordSuccess('Word文档生成成功！');
+                    }
+
+                } catch (error) {
+                    console.error('Word导出失败:', error);
+                    this.hideWordLoadingState();
+                    this.showWordError('Word导出失败: ' + error.message);
+                }
+            },
+
+            // 生成适合Word导出的HTML
+            generateWordHTML: function(data) {
+                const escapeHtml = (text) => {
+                    if (!text) return '';
+                    return text.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                };
+
+                const currentTemplate = window.getCurrentTemplate ? window.getCurrentTemplate() : 'classic';
+                const themeColor = getCurrentThemeColor ? getCurrentThemeColor() : '#8b5cf6';
+
+                // 生成Word友好的HTML结构
+                return `
+                    <!DOCTYPE html>
+                    <html lang="zh-CN">
+                    <head>
+                        <meta charset="UTF-8">
+                        <style>
+                            body {
+                                font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif;
+                                font-size: 12pt;
+                                line-height: 1.5;
+                                color: #333;
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .resume-header {
+                                text-align: center;
+                                padding: 20px 0;
+                                border-bottom: 2px solid ${themeColor};
+                                margin-bottom: 20px;
+                            }
+                            .resume-title {
+                                font-size: 24pt;
+                                font-weight: bold;
+                                color: ${themeColor};
+                                margin-bottom: 10px;
+                            }
+                            .contact-info {
+                                font-size: 11pt;
+                                margin-bottom: 10px;
+                            }
+                            .section-title {
+                                font-size: 14pt;
+                                font-weight: bold;
+                                color: ${themeColor};
+                                border-bottom: 1px solid ${themeColor};
+                                padding-bottom: 5px;
+                                margin: 20px 0 10px 0;
+                            }
+                            .item-header {
+                                font-weight: bold;
+                                margin-bottom: 5px;
+                            }
+                            .item-content {
+                                margin-bottom: 15px;
+                                padding-left: 10px;
+                            }
+                            .skill-item {
+                                display: inline-block;
+                                margin-right: 15px;
+                                margin-bottom: 5px;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 15px;
+                            }
+                            td {
+                                padding: 8px;
+                                border: 1px solid #ddd;
+                                vertical-align: top;
+                            }
+                            .table-header {
+                                background-color: #f5f5f5;
+                                font-weight: bold;
+                                text-align: center;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${this.renderWordContent(data, themeColor, currentTemplate)}
+                    </body>
+                    </html>
+                `;
+            },
+
+            // 渲染Word内容
+            renderWordContent: function(data, themeColor, template) {
+                const escapeHtml = (text) => {
+                    if (!text) return '';
+                    return text.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                };
+
+                let content = `
+                    <div class="resume-header">
+                        <div class="resume-title">${escapeHtml(data.name)}</div>
+                        <div class="contact-info">
+                            ${data.title ? `<div><strong>求职岗位：</strong>${escapeHtml(data.title)}</div>` : ''}
+                            ${data.phone ? `<span>电话：${escapeHtml(data.phone)}</span>` : ''}
+                            ${data.email ? `<span style="margin-left: 20px;">邮箱：${escapeHtml(data.email)}</span>` : ''}
+                            ${data.location ? `<span style="margin-left: 20px;">地址：${escapeHtml(data.location)}</span>` : ''}
+                        </div>
+                        ${data.tagline ? `<div style="margin-top: 10px; font-style: italic;">${escapeHtml(data.tagline)}</div>` : ''}
+                    </div>
+                `;
+
+                // 个人技能
+                if (data.skills && data.skills.length > 0) {
+                    content += `
+                        <div class="section-title">个人技能</div>
+                        <div class="item-content">
+                            ${data.skills.map(skill => 
+                                `<span class="skill-item">${escapeHtml(skill.name)} (${skill.rating}/5)</span>`
+                            ).join('')}
+                        </div>
+                    `;
+                }
+
+                // 教育背景
+                if (data.education && data.education.length > 0) {
+                    content += `<div class="section-title">教育背景</div>`;
+                    data.education.forEach(edu => {
+                        content += `
+                            <div class="item-header">
+                                ${escapeHtml(edu.school || '')} - ${escapeHtml(edu.major || '')}${edu.degree ? ` (${escapeHtml(edu.degree)})` : ''}
+                                ${edu.duration ? `<span style="float: right;">${escapeHtml(edu.duration)}</span>` : ''}
+                            </div>
+                            ${edu.description ? `<div class="item-content">${escapeHtml(edu.description)}</div>` : ''}
+                        `;
+                    });
+                }
+
+                // 工作经历
+                if (data.work_experience && data.work_experience.length > 0) {
+                    content += `<div class="section-title">工作经历</div>`;
+                    data.work_experience.forEach(work => {
+                        content += `
+                            <div class="item-header">
+                                ${escapeHtml(work.company || '')} - ${escapeHtml(work.position || '')}
+                                ${work.duration ? `<span style="float: right;">${escapeHtml(work.duration)}</span>` : ''}
+                            </div>
+                            ${work.description ? `
+                                <div class="item-content">
+                                    ${work.description.split('\n').filter(line => line.trim()).map(line => 
+                                        `<div>• ${escapeHtml(line.trim())}</div>`
+                                    ).join('')}
+                                </div>
+                            ` : ''}
+                        `;
+                    });
+                }
+
+                // 项目经验
+                if (data.projects && data.projects.length > 0) {
+                    content += `<div class="section-title">项目经验</div>`;
+                    data.projects.forEach(project => {
+                        content += `
+                            <div class="item-header">
+                                ${escapeHtml(project.name || '')}
+                                ${project.duration ? `<span style="float: right;">${escapeHtml(project.duration)}</span>` : ''}
+                            </div>
+                            ${project.tech ? `<div style="margin-bottom: 5px;"><strong>技术栈：</strong>${escapeHtml(project.tech)}</div>` : ''}
+                            ${project.description ? `<div class="item-content">${escapeHtml(project.description)}</div>` : ''}
+                        `;
+                    });
+                }
+
+                // 更多信息
+                if (data.more_info && data.more_info.length > 0) {
+                    content += `<div class="section-title">更多信息</div>`;
+                    data.more_info.forEach(info => {
+                        content += `
+                            <div class="item-content">
+                                <strong>${escapeHtml(info.title)}</strong>
+                                ${info.time ? ` (${escapeHtml(info.time)})` : ''}
+                            </div>
+                        `;
+                    });
+                }
+
+                return content;
+            },
+
+            // 获取表单数据
+            getFormData: function() {
+                if (typeof getFormData === 'function') {
+                    return getFormData();
+                }
+                
+                // 备用数据获取方法
+                return {
+                    name: document.getElementById('name')?.value || '未填写姓名',
+                    title: document.getElementById('title')?.value || '',
+                    tagline: document.getElementById('tagline')?.value || '',
+                    phone: document.getElementById('phone')?.value || '',
+                    email: document.getElementById('email')?.value || '',
+                    location: document.getElementById('location')?.value || '',
+                    skills: [],
+                    education: [],
+                    work_experience: [],
+                    projects: [],
+                    more_info: []
+                };
+            },
+
+            // 验证必填字段
+            validateRequiredFields: function(data) {
+                if (!data.name || !data.name.trim()) {
+                    this.showWordError('请填写姓名');
+                    return false;
+                }
+                if (!data.email || !data.email.trim()) {
+                    this.showWordError('请填写邮箱');
+                    return false;
+                }
+                return true;
+            },
+
+            // 显示Word加载状态
+            showWordLoadingState: function(message = '正在生成Word文档...') {
+                const button = document.getElementById('export-word-btn');
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>${message}`;
+                }
+            },
+
+            // 隐藏Word加载状态
+            hideWordLoadingState: function() {
+                const button = document.getElementById('export-word-btn');
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = `<i class="fas fa-file-word me-2"></i>导出Word`;
+                }
+            },
+
+            // 显示Word成功消息
+            showWordSuccess: function(message) {
+                if (typeof showMessage === 'function') {
+                    showMessage(message, 'success');
+                } else {
+                    alert(message);
+                }
+            },
+
+            // 显示Word错误消息
+            showWordError: function(message) {
+                if (typeof showMessage === 'function') {
+                    showMessage(message, 'error');
+                } else {
+                    alert('错误: ' + message);
+                }
+            }
+        };
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化主题管理器
+            ThemeManager.init();
+
+            // 初始化模板管理器
+            TemplateManager.init();
+
+            // 绑定Word导出按钮
+            const exportWordBtn = document.getElementById('export-word-btn');
+            if (exportWordBtn) {
+                exportWordBtn.addEventListener('click', function() {
+                    WordExporter.exportToWord();
+                });
+            }
+
+            // 监听折叠事件
+            const collapseElements = document.querySelectorAll('.collapse');
+            
+            collapseElements.forEach(function(element) {
+                element.addEventListener('show.bs.collapse', function() {
+                    const header = document.querySelector(`[data-bs-target="#${this.id}"]`);
+                    if (header) {
+                        const icon = header.querySelector('.collapse-icon');
+                        if (icon) icon.classList.add('rotated');
+                    }
+                });
+                
+                element.addEventListener('hide.bs.collapse', function() {
+                    const header = document.querySelector(`[data-bs-target="#${this.id}"]`);
+                    if (header) {
+                        const icon = header.querySelector('.collapse-icon');
+                        if (icon) icon.classList.remove('rotated');
+                    }
+                });
+            });
+
+            // 更新计数器
+            updateAllCounts();
+
+            // 初始化工具提示
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        });
+
+        // 更新所有计数器
+        function updateAllCounts() {
+            // 技能计数
+            const skillsCount = document.querySelectorAll('#skills-container .skill-item').length;
+            const skillsCountEl = document.getElementById('skillsCount');
+            if (skillsCountEl) skillsCountEl.textContent = skillsCount;
+            
+            // 教育背景计数
+            const educationCount = document.querySelectorAll('#education-container .education-item').length;
+            const educationCountEl = document.getElementById('educationCount');
+            if (educationCountEl) educationCountEl.textContent = educationCount;
+            
+            // 工作经历计数
+            const workCount = document.querySelectorAll('#work-container .work-item').length;
+            const workCountEl = document.getElementById('workCount');
+            if (workCountEl) workCountEl.textContent = workCount;
+            
+            // 项目经验计数
+            const projectsCount = document.querySelectorAll('#projects-container .project-item').length;
+            const projectsCountEl = document.getElementById('projectsCount');
+            if (projectsCountEl) projectsCountEl.textContent = projectsCount;
+            
+            // 更多信息计数
+            const moreInfoCount = document.querySelectorAll('#more-info-container .more-info-item').length;
+            const moreInfoCountEl = document.getElementById('moreInfoCount');
+            if (moreInfoCountEl) moreInfoCountEl.textContent = moreInfoCount;
+
+            // 更新摘要信息
+            updateSummaries();
+        }
+
+        // 更新摘要信息
+        function updateSummaries() {
+            // 更新基本信息摘要
+            const name = document.getElementById('name').value || '未填写';
+            const title = document.getElementById('title').value || '未设置';
+            const summaryEl = document.getElementById('basicInfoSummary');
+            if (summaryEl) summaryEl.textContent = `${name} - ${title}`;
+            
+            // 更新头像状态
+            const hasAvatar = document.querySelector('#avatar-preview img') !== null;
+            const avatarSummaryEl = document.getElementById('avatarSummary');
+            if (avatarSummaryEl) avatarSummaryEl.textContent = hasAvatar ? '已上传头像' : '尚未上传头像';
+        }
+
+        // 监听输入变化以更新计数和预览
+        $(document).ready(function() {
+            $('#resumeForm').on('input change', function() {
+                updateAllCounts();
+                // 延迟更新预览，确保DOM更新完成
+                setTimeout(updatePreview, 100);
+            });
+        });
+
+        // 导出当前模板信息供app.js使用
+        window.getCurrentTemplate = function() {
+            return TemplateManager.getCurrentTemplate();
+        };
+
+        // 导出模板管理器供app.js使用
+        window.TemplateManager = TemplateManager;
+
+        // 导出Word导出器供全局使用
+        window.WordExporter = WordExporter;
+    </script>
+</body>
+</html>

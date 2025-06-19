@@ -1,0 +1,19 @@
+{
+    "name": "resume-generator/pdf-generator",
+    "description": "Resume PDF Generator",
+    "type": "project",
+    "require": {
+        "php": ">=7.2",
+        "dompdf/dompdf": "^2.0",
+        "tecnickcom/tcpdf": "^6.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "ResumeGenerator\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
