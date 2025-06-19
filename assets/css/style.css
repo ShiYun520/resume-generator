@@ -1,0 +1,576 @@
+/* 整体布局 */
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.container-fluid {
+    padding: 0;
+}
+
+/* 编辑面板样式 */
+.editor-panel {
+    background-color: #fff;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px;
+}
+
+.editor-panel .card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.editor-panel .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.editor-panel h5 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #007bff;
+}
+
+/* 头像上传区域 */
+.avatar-upload {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #e0e0e0;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    overflow: hidden;
+    position: relative;
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-preview .placeholder {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+}
+
+.avatar-upload input[type="file"] {
+    display: none;
+}
+
+.avatar-upload label {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.avatar-upload label:hover {
+    background: #0056b3;
+}
+
+/* 表单元素样式 */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* 技能评级样式 */
+.skill-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.skill-name {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.skill-rating {
+    display: flex;
+    gap: 2px;
+}
+
+.star {
+    width: 16px;
+    height: 16px;
+    background: #ddd;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.star.active {
+    background: #ffd700;
+}
+
+.star:hover {
+    background: #ffed4a;
+}
+
+/* 工作经历和项目样式 */
+.work-item, .project-item {
+    position: relative;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background-color: #f8f9fa;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+.work-item .btn-remove, .project-item .btn-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* 预览面板样式 */
+.preview-panel {
+    background-color: #f5f5f5;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.preview-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* 简历模板样式 - 基于图片设计 */
+.resume-template {
+    background: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    line-height: 1.5;
+    min-height: 800px;
+    display: flex;
+}
+
+/* 左侧紫色个人信息栏 */
+.resume-sidebar {
+    background: linear-gradient(135deg, #a855f7, #8b5cf6, #7c3aed);
+    width: 280px;
+    padding: 40px 25px;
+    color: white;
+    border-radius: 8px 0 0 8px;
+    position: relative;
+}
+
+.resume-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(168,85,247,0.9), rgba(139,92,246,0.9), rgba(124,58,237,0.9));
+    border-radius: 8px 0 0 8px;
+}
+
+.resume-sidebar > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 头像区域 */
+.sidebar-avatar {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.sidebar-avatar img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.3);
+    object-fit: cover;
+}
+
+.sidebar-avatar .placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+}
+
+/* 姓名和标语 */
+.sidebar-name {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.sidebar-tagline {
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+/* 联系信息 */
+.sidebar-contact {
+    margin-bottom: 30px;
+}
+
+.sidebar-contact .contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.sidebar-contact .contact-item .icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* 技能区域 */
+.sidebar-skills {
+    margin-bottom: 30px;
+}
+
+.sidebar-section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    position: relative;
+}
+
+.skill-item-sidebar {
+    margin-bottom: 15px;
+}
+
+.skill-name-sidebar {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.skill-rating-sidebar {
+    display: flex;
+    gap: 3px;
+}
+
+.star-sidebar {
+    width: 14px;
+    height: 14px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+}
+
+.star-sidebar.active {
+    background: #ffd700;
+}
+
+/* 教育背景 */
+.sidebar-education {
+    margin-bottom: 20px;
+}
+
+.education-item {
+    margin-bottom: 15px;
+}
+
+.education-school {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.education-degree {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.education-year {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+/* 右侧主要内容区 */
+.resume-main {
+    flex: 1;
+    padding: 40px;
+    background: white;
+    border-radius: 0 8px 8px 0;
+}
+
+/* 主要区域标题 */
+.main-section-title {
+    font-size: 24px;
+    color: #8b5cf6;
+    font-weight: bold;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.main-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: #8b5cf6;
+}
+
+/* 工作经历样式 */
+.work-experience-item {
+    margin-bottom: 30px;
+    position: relative;
+    border-left: 3px solid #8b5cf6;
+    padding-left: 20px;
+    margin-left: 10px;
+}
+
+.work-experience-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    background: #8b5cf6;
+    border-radius: 50%;
+}
+
+.work-header {
+    margin-bottom: 12px;
+}
+
+.work-company {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.work-position {
+    font-size: 16px;
+    color: #8b5cf6;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.work-duration {
+    font-size: 14px;
+    color: #666;
+    float: right;
+    background: #f0f8ff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.work-description {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    clear: both;
+}
+
+.work-description p {
+    margin-bottom: 8px;
+}
+
+/* 项目经历样式 */
+.project-experience-item {
+    margin-bottom: 30px;
+    border: 1px solid #e0e4e7;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fafbfc;
+    position: relative;
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.project-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.project-duration {
+    font-size: 12px;
+    color: #666;
+    background: #e7f3ff;
+    padding: 4px 8px;
+    border-radius: 10px;
+}
+
+.project-description {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.project-tech {
+    font-size: 12px;
+    color: #8b5cf6;
+    background: #f3f0ff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .resume-template {
+        flex-direction: column;
+    }
+    
+    .resume-sidebar {
+        width: 100%;
+        border-radius: 8px 8px 0 0;
+        padding: 30px 20px;
+    }
+    
+    .resume-main {
+        border-radius: 0 0 8px 8px;
+        padding: 30px 20px;
+    }
+    
+    .sidebar-name {
+        font-size: 24px;
+    }
+    
+    .work-duration {
+        float: none;
+        display: inline-block;
+        margin-top: 5px;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .resume-template {
+        box-shadow: none;
+        margin: 0;
+        min-height: auto;
+    }
+    
+    .editor-panel {
+        display: none;
+    }
+    
+    .preview-panel {
+        width: 100% !important;
+        padding: 0;
+    }
+    
+    .resume-sidebar {
+        background: #8b5cf6 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}
+/* PDF导出优化样式 */
+.resume-template {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* 确保在PDF中正确显示渐变背景 */
+.resume-sidebar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -webkit-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -moz-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -o-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -ms-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* 备用纯色背景 */
+    background-color: #667eea;
+}
+
+/* 优化打印和PDF导出 */
+@media print {
+    .resume-template {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    
+    .resume-sidebar {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
